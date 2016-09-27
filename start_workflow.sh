@@ -41,7 +41,12 @@ if [[ $NUM_FILES -gt 1 ]]; then
   fi
 fi
 
-JOB_ID1=$(qsub $JOBS_ARGS -v CWD,SCRIPT_DIR,BT2_OUT_DIR,BT2_INDEX,INDEX_BASE,FASTA_LIST,FASTA_DIR,STEP_SIZE -N Bowtie2 -j oe -o "$STDOUT_DIR" $SCRIPT_DIR/bt2_align.sh)
+while read FASTA; do
+    export FASTA="$FASTA"
+
+    JOB_ID1=$(qsub $JOBS_ARGS -v CWD,FASTA,SCRIPT_DIR,BT2_OUT_DIR,BT2_INDEX,INDEX_BASE,FASTA_LIST,FASTA_DIR,STEP_SIZE -N Bowtie2 -j oe -o "$STDOUT_DIR" $SCRIPT_DIR/bt2_align.sh)
+
+done < $FASTA_LIST
 
 JOB_ID2=$(qsub -v FASTA_DIR,SCRIPT_DIR,BT2_OUT_DIR,NUM_THREAD,MIN_LEN,CON_OUT -N Megahit -W depend=afterok:$JOB_ID1 -j oe -o "$STDOUT_DIR" $SCRIPT_DIR/run_assembly.sh)
 

@@ -13,8 +13,8 @@
 
 set -u
 
-cd $FASTA_DIR
+cd $BT2_OUT_DIR
 
-FASTA=$(ls ./*.fasta | python -c 'import sys; print ",".join([x.strip() for x in sys.stdin.readlines()])')
+FASTA=$(ls ./*.unmapped | python -c 'import sys; print ",".join([x.strip() for x in sys.stdin.readlines()])')
 
 megahit -r $FASTA --min-contig-len $MIN_LEN -t $NUM_THREAD -o $CON_OUT

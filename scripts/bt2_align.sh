@@ -17,17 +17,9 @@ source $CWD/functions2.sh
 
 module load bowtie2/2.2.5
 
-TMP_FILES=$(mktemp)
-get_lines $FASTA_LIST $TMP_FILES ${PBS_ARRAY_INDEX:-1} ${STEP_SIZE:-1}
+FILE="$FASTA_DIR/$FASTA"
+FILE_NAME=$(basename $FASTA | cut -d '.' -f 1)
 
-i=0
-while read FILE; do
-  FILE_NAME=$(basename $FASTA | cut -d '.' -f 1)
 
-  let i++
-  printf "%3d: %s\n" $i $FILE_NAME
+bowtie2 -x $BT2_INDEX/$INDEX_BASE -U $FILE -f --very-sensitive-local -p 4 --un $BT2_OUT_DIR/$FILE_NAME.unmapped 
 
-  bowtie2 -x $BT2_INDEX/$INDEX_BASE -U $FILE -f --very-sensitive-local -p 4 --un $BT2_OUT_DIR/$FILE_NAME.unmapped 
-done < $TMP_FILES 
-
-echo Done.
