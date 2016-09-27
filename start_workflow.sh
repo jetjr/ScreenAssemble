@@ -43,9 +43,5 @@ fi
 
 JOB_ID1=$(qsub $JOBS_ARGS -v CWD,SCRIPT_DIR,BT2_OUT_DIR,BT2_INDEX,INDEX_BASE,FASTA_LIST,FASTA_DIR,STEP_SIZE -N Bowtie2 -j oe -o "$STDOUT_DIR" $SCRIPT_DIR/bt2_align.sh)
 
-export UNMAPPED_LIST=$(mktemp)
-sed 's/.fasta/.unmapped/' $FASTA_LIST > $UNMAPPED_LIST
+JOB_ID2=$(qsub -v FASTA_DIR,SCRIPT_DIR,BT2_OUT_DIR,NUM_THREAD,MIN_LEN,CON_OUT -N Megahit -W depend=afterok:$JOB_ID1 -j oe -o "$STDOUT_DIR" $SCRIPT_DIR/run_assembly.sh)
 
-JOB_ID2=$(qsub $JOBS_ARG -v UNMAPPED_LIST,SCRIPT_DIR,BT2_OUT_DIR,NUM_THREAD,MIN_LEN,CON_OUT,STEP_SIZE -N Megahit -W depend=afterok:$JOB_ID1 -j oe -o "$STDOUT_DIR" $SCRIPT_DIR/run_assembly.sh)
-
-rm $UNMAPPED_LIST
